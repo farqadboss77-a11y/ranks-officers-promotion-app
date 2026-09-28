@@ -1,0 +1,119 @@
+╔════════════════════════════════════════════════════════╗
+║  نظام ترقية المراتب والضباط - البدء السريع             ║
+║  Officers Promotion System - Quick Start               ║
+╚════════════════════════════════════════════════════════╝
+
+🚀 ابدأ الآن في 3 خطوات فقط:
+🚀 Start now in just 3 steps:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ الخطوة 1: نقل المجلد
+✅ Step 1: Move the folder
+
+انسخ مجلد التطبيق إلى أي مكان في جهازك
+(C:\Users\YourName\Desktop مثلاً)
+
+Copy the application folder anywhere on your computer.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ الخطوة 2: تثبيت Node.js (إذا لم يكن مثبتاً)
+✅ Step 2: Install Node.js (if not installed)
+
+حمّل من: https://nodejs.org/
+Download from: https://nodejs.org/
+
+اختر LTS (الإصدار المستقر)
+Choose LTS (Stable Version)
+
+إعادة تشغيل الكمبيوتر بعد التثبيت مهمة جداً!
+Restart your computer after installation is very important!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ الخطوة 3: التشغيل
+✅ Step 3: Run
+
+🖥️ على Windows:
+   انقر مزدوجاً على: START-HERE.bat
+   Double-click: START-HERE.bat
+
+🍎 على macOS:
+   افتح Terminal وشغّل:
+   Open Terminal and run:
+   chmod +x start.sh && ./start.sh
+
+🐧 على Linux:
+   افتح Terminal وشغّل:
+   Open Terminal and run:
+   chmod +x start.sh && ./start.sh
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏱️ الانتظار:
+
+المرة الأولى ستستغرق 2-3 دقائق (تثبيت المكتبات)
+First time will take 2-3 minutes (installing libraries)
+
+بعدها سيفتح المتصفح تلقائياً على:
+After that, your browser will open automatically at:
+
+👉 http://localhost:3000
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ بدء الاستخدام:
+✨ Start Using:
+
+1️⃣  أضف ضابط جديد في النموذج الأول
+2️⃣  قدّم طلب ترقية في النموذج الثاني
+3️⃣  اعرض القوائم وأدر الطلبات
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❓ استفسارات شائعة:
+❓ FAQ:
+
+س: ظهرت رسالة "Node.js غير مثبت"
+ج: حمّل Node.js من https://nodejs.org/
+   أعد تشغيل الجهاز
+   شغّل البرنامج مجدداً
+
+Q: "Node.js not installed" message appeared
+A: Download Node.js from https://nodejs.org/
+   Restart your computer
+   Run the program again
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+س: المتصفح لم ينفتح تلقائياً
+ج: انسخ والصق في المتصفح:
+   http://localhost:3000
+
+Q: Browser didn't open automatically
+A: Copy and paste in your browser:
+   http://localhost:3000
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+س: كيفية إيقاف البرنامج
+ج: اضغط Ctrl+C في نافذة الأوامر
+
+Q: How to stop the program
+A: Press Ctrl+C in the command window
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 للمزيد من المعلومات:
+📚 For more information:
+
+افتح ملف: INSTALL.md
+Open file: INSTALL.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ مرحباً بك في نظام ترقية المراتب والضباط! ✨
+✨ Welcome to Officers Promotion System! ✨
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

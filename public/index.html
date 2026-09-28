@@ -9,21 +9,60 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <div class="brand">
-          <div class="brand-badge">م</div>
-          <div>
-            <h1>نظام ترقية المراتب والضباط</h1>
-            <p>لوحة متابعة الأداء والتقييم والترقية</p>
+        <div class="brand-wrap">
+          <div class="brand">
+            <div class="brand-badge">م</div>
+            <div>
+              <h1>نظام ترقية المراتب والضباط</h1>
+              <p>لوحة متابعة الأداء والتقييم والترقية</p>
+            </div>
           </div>
+
+          <nav class="topnav" aria-label="التنقل الرئيسي">
+            <span class="nav-item active">الرئيسية</span>
+            <span class="nav-item">الضباط</span>
+            <span class="nav-item">الترقيات</span>
+            <span class="nav-item">التقارير</span>
+          </nav>
         </div>
       </header>
 
       <main class="container">
+        <section class="hero-summary">
+          <div class="hero-copy">
+            <span class="eyebrow">لوحة المتابعة</span>
+            <h2>إدارة دقيقة للترقية والجاهزية التشغيلية</h2>
+            <p>
+              متابعة درجات الأداء، مراجعة ملفات الضباط، ومراجعة طلبات الترقية في
+              بيئة موحدة واحترافية.
+            </p>
+          </div>
+          <div class="hero-status">
+            <div class="status-pill success">جاهز للتنفيذ</div>
+            <div class="mini-metrics">
+              <div>
+                <strong>43</strong>
+                <span>ملف قيد المراجعة</span>
+              </div>
+              <div>
+                <strong>12</strong>
+                <span>طلبات جديدة</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="stats-grid" id="stats-grid"></section>
 
         <div class="two-column">
-          <section class="panel">
-            <h2>إضافة ضابط جديد</h2>
+          <section class="panel panel-form">
+            <div class="panel-head">
+              <div>
+                <span class="panel-tag">إضافة</span>
+                <h2>ضابط جديد</h2>
+              </div>
+            </div>
+
             <form id="officer-form">
               <div class="form-grid">
                 <div class="field">
@@ -81,8 +120,14 @@
             </form>
           </section>
 
-          <section class="panel">
-            <h2>تقديم طلب ترقية</h2>
+          <section class="panel panel-form">
+            <div class="panel-head">
+              <div>
+                <span class="panel-tag">طلب</span>
+                <h2>تقديم ترقية</h2>
+              </div>
+            </div>
+
             <form id="promotion-form">
               <div class="form-grid">
                 <div class="field">
@@ -124,7 +169,13 @@
         </div>
 
         <section class="panel">
-          <h2>قائمة الضباط</h2>
+          <div class="panel-head">
+            <div>
+              <span class="panel-tag">الضباط</span>
+              <h2>قائمة الضباط</h2>
+            </div>
+          </div>
+
           <div class="table-wrap">
             <table>
               <thead>
@@ -145,7 +196,13 @@
         </section>
 
         <section class="panel">
-          <h2>طلبات الترقية</h2>
+          <div class="panel-head">
+            <div>
+              <span class="panel-tag">الطلبات</span>
+              <h2>طلبات الترقية</h2>
+            </div>
+          </div>
+
           <div class="table-wrap">
             <table>
               <thead>

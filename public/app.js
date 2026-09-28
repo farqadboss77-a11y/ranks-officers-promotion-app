@@ -5,8 +5,8 @@ const officerSelect = document.getElementById('officer-select');
 
 const statusMap = {
   active: 'نشط',
-  ready: 'جاهز',
-  review: 'مراجعة',
+  ready: 'جاهز للترقية',
+  review: 'قيد المراجعة',
   pending: 'معلق',
   promoted: 'مُرقّي'
 };
@@ -21,38 +21,76 @@ const decisionMap = {
 const safeText = (value) => value ?? 'غير محدد';
 
 async function fetchJson(url, options = {}) {
-  const response = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options
-  });
+  try {
+    const response = await fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options
+    });
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({ message: 'حدث خطأ' }));
-    throw new Error(err.message || 'حدث خطأ غير متوقع');
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ message: 'حدث خطأ' }));
+      throw new Error(err.message || 'حدث خطأ غير متوقع');
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Fetch error:', error);
+    throw error;
   }
-
-  return response.json();
 }
 
 function renderStats(data) {
   const cards = [
-    { label: 'إجمالي الضباط', value: data.total || 0, sub: 'مفهرون في النظام' },
-    { label: 'جاهزون للترقية', value: data.ready || 0, sub: 'بناءً على الأداء' },
-    { label: 'طلبات معلقة', value: data.pending || 0, sub: 'تحتاج مراجعة' },
-    { label: 'متوسط الأداء', value: `${data.averageScore || 0}`, sub: 'من 100' }
+    {
+      label: 'إجمالي الضباط',
+      value: data.total || 0,
+      sub: 'مفهرسون في النظام'
+    },
+    {
+      label: 'جاهزون للتر��ية',
+      value: data.ready || 0,
+      sub: 'بناءً على الأداء والسنوات'
+    },
+    {
+      label: 'طلبات معلقة',
+      value: data.pending || 0,
+      sub: 'تحتاج إلى مراجعة'
+    },
+    {
+      label: 'متوسط الأداء',
+      value: `${data.averageScore || 0}%`,
+      sub: 'من أصل 100'
+    }
   ];
 
-  statsGrid.innerHTML = cards.map((card) => `
+  statsGrid.innerHTML = cards
+    .map(
+      (card) => `
     <article class="card">
       <span class="card-label">${card.label}</span>
       <div class="card-value">${card.value}</div>
       <div class="card-sub">${card.sub}</div>
     </article>
-  `).join('');
+  `
+    )
+    .join('');
 }
 
 function renderOfficers(officers) {
-  officerTableBody.innerHTML = officers.map((officer) => `
+  if (!officers || officers.length === 0) {
+    officerTableBody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 40px; color: var(--muted);">
+          لا توجد بيانات ضباط حالياً
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  officerTableBody.innerHTML = officers
+    .map(
+      (officer) => `
     <tr>
       <td>${safeText(officer.name)}</td>
       <td>${safeText(officer.rank)}</td>
@@ -60,21 +98,40 @@ function renderOfficers(officers) {
       <td>${safeText(officer.specialty)}</td>
       <td>${safeText(officer.years_of_service)}</td>
       <td>${safeText(officer.performance_score)}</td>
-      <td><span class="badge ${officer.status || 'active'}">${statusMap[officer.status] || 'نشط'}</span></td>
+      <td><span class="badge ${officer.status || 'active'}">${
+        statusMap[officer.status] || 'نشط'
+      }</span></td>
       <td>
         <div class="inline-actions">
-          <button class="secondary" type="button" data-action="update-officer" data-id="${officer.id}">تحديث</button>
-          <button class="danger" type="button" data-action="delete-officer" data-id="${officer.id}">حذف</button>
+          <button class="secondary" type="button" data-action="update-officer" data-id="${
+            officer.id
+          }">تحديث</button>
+          <button class="danger" type="button" data-action="delete-officer" data-id="${
+            officer.id
+          }">حذف</button>
         </div>
       </td>
     </tr>
-  `).join('');
+  `
+    )
+    .join('');
 
+  attachOfficerEvents(officers);
+}
+
+function attachOfficerEvents(officers) {
   document.querySelectorAll('[data-action="delete-officer"]').forEach((button) => {
     button.addEventListener('click', async () => {
       const id = button.dataset.id;
-      await fetchJson(`/api/officers/${id}`, { method: 'DELETE' });
-      await loadData();
+      if (confirm('هل أنت متأكد من حذف هذا الضابط؟')) {
+        try {
+          await fetchJson(`/api/officers/${id}`, { method: 'DELETE' });
+          showNotification('تم حذف الضابط بنجاح', 'success');
+          await loadData();
+        } catch (error) {
+          showNotification(error.message, 'error');
+        }
+      }
     });
   });
 
@@ -84,37 +141,48 @@ function renderOfficers(officers) {
       const officer = officers.find((item) => String(item.id) === String(id));
       if (!officer) return;
 
-      const payload = {
-        ...officer,
-        years_of_service: Number(officer.years_of_service || 0),
-        performance_score: Number(officer.performance_score || 0)
-      };
-
       const form = document.getElementById('officer-form');
-      form.name.value = payload.name || '';
-      form.rank.value = payload.rank || '';
-      form.unit.value = payload.unit || '';
-      form.specialty.value = payload.specialty || '';
-      form.years_of_service.value = payload.years_of_service || 0;
-      form.status.value = payload.status || 'active';
-      form.performance_score.value = payload.performance_score || 0;
-      form.last_promotion.value = payload.last_promotion || '';
+      form.name.value = officer.name || '';
+      form.rank.value = officer.rank || '';
+      form.unit.value = officer.unit || '';
+      form.specialty.value = officer.specialty || '';
+      form.years_of_service.value = officer.years_of_service || 0;
+      form.status.value = officer.status || 'active';
+      form.performance_score.value = officer.performance_score || 0;
+      form.last_promotion.value = officer.last_promotion || '';
 
       form.dataset.editId = String(id);
+      const submitBtn = form.querySelector('[type="submit"]');
+      submitBtn.textContent = 'تحديث الضابط';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
 }
 
 function renderPromotions(promotions) {
-  promotionTableBody.innerHTML = promotions.map((request) => `
+  if (!promotions || promotions.length === 0) {
+    promotionTableBody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 40px; color: var(--muted);">
+          لا توجد طلبات ترقية حالياً
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  promotionTableBody.innerHTML = promotions
+    .map(
+      (request) => `
     <tr>
       <td>${safeText(request.officer_name)}</td>
       <td>${safeText(request.officer_rank)}</td>
       <td>${safeText(request.proposed_rank)}</td>
       <td>${safeText(request.requested_by)}</td>
       <td>${safeText(request.score)}</td>
-      <td><span class="badge ${request.status || 'pending'}">${decisionMap[request.status] || 'قيد الانتظار'}</span></td>
+      <td><span class="badge ${request.status || 'pending'}">${
+        decisionMap[request.status] || 'قيد الانتظار'
+      }</span></td>
       <td>
         <div class="inline-actions">
           <button class="secondary" type="button" data-action="approve" data-id="${request.id}">موافق</button>
@@ -122,36 +190,106 @@ function renderPromotions(promotions) {
         </div>
       </td>
     </tr>
-  `).join('');
+  `
+    )
+    .join('');
 
+  attachPromotionEvents();
+}
+
+function attachPromotionEvents() {
   document.querySelectorAll('[data-action="approve"]').forEach((button) => {
     button.addEventListener('click', async () => {
       const id = button.dataset.id;
-      await fetchJson(`/api/promotions/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ decision: 'approved', status: 'approved' })
-      });
-      await loadData();
+      try {
+        await fetchJson(`/api/promotions/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ decision: 'approved', status: 'approved' })
+        });
+        showNotification('تم الموافقة على الطلب بنجاح', 'success');
+        await loadData();
+      } catch (error) {
+        showNotification(error.message, 'error');
+      }
     });
   });
 
   document.querySelectorAll('[data-action="reject"]').forEach((button) => {
     button.addEventListener('click', async () => {
       const id = button.dataset.id;
-      await fetchJson(`/api/promotions/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ decision: 'rejected', status: 'rejected' })
-      });
-      await loadData();
+      if (confirm('هل أنت متأكد من رفض هذا الطلب؟')) {
+        try {
+          await fetchJson(`/api/promotions/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ decision: 'rejected', status: 'rejected' })
+          });
+          showNotification('تم رفض الطلب', 'error');
+          await loadData();
+        } catch (error) {
+          showNotification(error.message, 'error');
+        }
+      }
     });
   });
 }
 
 function populateOfficerSelect(officers) {
-  officerSelect.innerHTML = ['<option value="">اختر الضابط</option>']
-    .concat(officers.map((officer) => `<option value="${officer.id}">${officer.name} (${officer.rank})</option>`))
-    .join('');
+  if (!officers || officers.length === 0) {
+    officerSelect.innerHTML = '<option value="">لا توجد ضباط</option>';
+    return;
+  }
+
+  officerSelect.innerHTML = [
+    '<option value="">اختر الضابط</option>',
+    ...officers.map(
+      (officer) =>
+        `<option value="${officer.id}">${officer.name} (${officer.rank})</option>`
+    )
+  ].join('');
 }
+
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: auto;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: ${
+      type === 'success' ? 'rgba(91, 227, 154, 0.12)' : 'rgba(248, 113, 113, 0.12)'
+    };
+    color: ${type === 'success' ? '#b2f7d0' : '#ffd2d2'};
+    border: 1px solid ${
+      type === 'success' ? 'rgba(91, 227, 154, 0.22)' : 'rgba(248, 113, 113, 0.18)'
+    };
+    z-index: 9999;
+    animation: slideIn 0.3s ease;
+  `;
+
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => notification.remove(), 300);
+  }, 4000);
+}
+
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+`;
+document.head.appendChild(style);
 
 async function loadData() {
   try {
@@ -167,7 +305,7 @@ async function loadData() {
     populateOfficerSelect(officers);
   } catch (error) {
     console.error(error);
-    alert(error.message || 'حدث خطأ أثناء تحميل البيانات');
+    showNotification('فشل تحميل البيانات: ' + error.message, 'error');
   }
 }
 
@@ -175,16 +313,28 @@ document.getElementById('officer-form').addEventListener('submit', async (event)
   event.preventDefault();
 
   const form = event.currentTarget;
+  const submitBtn = form.querySelector('[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'جاري الحفظ...';
+
   const payload = {
-    name: form.name.value,
+    name: form.name.value.trim(),
     rank: form.rank.value,
-    unit: form.unit.value,
-    specialty: form.specialty.value,
+    unit: form.unit.value.trim(),
+    specialty: form.specialty.value.trim(),
     years_of_service: Number(form.years_of_service.value || 0),
     status: form.status.value,
     performance_score: Number(form.performance_score.value || 0),
-    last_promotion: form.last_promotion.value
+    last_promotion: form.last_promotion.value.trim()
   };
+
+  if (!payload.name || !payload.rank) {
+    showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    return;
+  }
 
   try {
     if (form.dataset.editId) {
@@ -192,18 +342,24 @@ document.getElementById('officer-form').addEventListener('submit', async (event)
         method: 'PUT',
         body: JSON.stringify(payload)
       });
+      showNotification('تم تحديث الضابط بنجاح', 'success');
     } else {
       await fetchJson('/api/officers', {
         method: 'POST',
         body: JSON.stringify(payload)
       });
+      showNotification('تم إضافة الضابط بنجاح', 'success');
     }
 
     form.reset();
     delete form.dataset.editId;
+    submitBtn.textContent = 'حفظ الضابط';
     await loadData();
   } catch (error) {
-    alert(error.message || 'حدث خطأ أثناء حفظ الضابط');
+    showNotification(error.message, 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
   }
 });
 
@@ -211,15 +367,27 @@ document.getElementById('promotion-form').addEventListener('submit', async (even
   event.preventDefault();
 
   const form = event.currentTarget;
+  const submitBtn = form.querySelector('[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'جاري الإرسال...';
+
   const payload = {
     officer_id: form.officer_id.value,
     proposed_rank: form.proposed_rank.value,
-    requested_by: form.requested_by.value,
-    reason: form.reason.value,
+    requested_by: form.requested_by.value.trim(),
+    reason: form.reason.value.trim(),
     score: Number(form.score.value || 0),
     decision: 'pending',
     status: 'pending'
   };
+
+  if (!payload.officer_id || !payload.proposed_rank) {
+    showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    return;
+  }
 
   try {
     await fetchJson('/api/promotions', {
@@ -227,11 +395,21 @@ document.getElementById('promotion-form').addEventListener('submit', async (even
       body: JSON.stringify(payload)
     });
 
+    showNotification('تم إرسال طلب الترقية بنجاح', 'success');
     form.reset();
     await loadData();
   } catch (error) {
-    alert(error.message || 'حدث خطأ أثناء إرسال الطلب');
+    showNotification(error.message, 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
   }
 });
 
+// Initial load
 loadData();
+
+// Auto-refresh every 30 seconds
+setInterval(() => {
+  loadData().catch(console.error);
+}, 30000);

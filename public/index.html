@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ترقية المراتب والضباط</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-badge">م</div>
+          <div>
+            <h1>نظام ترقية المراتب والضباط</h1>
+            <p>لوحة متابعة الأداء والتقييم والترقية</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="container">
+        <section class="stats-grid" id="stats-grid"></section>
+
+        <div class="two-column">
+          <section class="panel">
+            <h2>إضافة ضابط جديد</h2>
+            <form id="officer-form">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="name">الاسم الكامل</label>
+                  <input id="name" name="name" type="text" placeholder="مثال: أحمد سالم" required />
+                </div>
+                <div class="field">
+                  <label for="rank">الرتبة</label>
+                  <select id="rank" name="rank" required>
+                    <option value="">اختر الرتبة</option>
+                    <option value="ملازم">ملازم</option>
+                    <option value="ملازم أول">ملازم أول</option>
+                    <option value="نقيب">نقيب</option>
+                    <option value="رائد">رائد</option>
+                    <option value="مقدم">مقدم</option>
+                    <option value="عقيد">عقيد</option>
+                    <option value="عميد">عميد</option>
+                    <option value="لواء">لواء</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="unit">الوحدة</label>
+                  <input id="unit" name="unit" type="text" placeholder="لواء المراقبة" />
+                </div>
+                <div class="field">
+                  <label for="specialty">الاختصاص</label>
+                  <input id="specialty" name="specialty" type="text" placeholder="العمليات" />
+                </div>
+                <div class="field">
+                  <label for="years_of_service">سنوات الخدمة</label>
+                  <input id="years_of_service" name="years_of_service" type="number" min="0" value="0" />
+                </div>
+                <div class="field">
+                  <label for="status">حالة الضابط</label>
+                  <select id="status" name="status">
+                    <option value="active">نشط</option>
+                    <option value="ready">جاهز للترقية</option>
+                    <option value="review">قيد المراجعة</option>
+                    <option value="pending">معلق</option>
+                    <option value="promoted">مُرقّي</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="performance_score">نقاط الأداء</label>
+                  <input id="performance_score" name="performance_score" type="number" min="0" max="100" value="80" />
+                </div>
+                <div class="field">
+                  <label for="last_promotion">آخر ترقية</label>
+                  <input id="last_promotion" name="last_promotion" type="text" placeholder="2024-01-15" />
+                </div>
+              </div>
+              <div class="btn-row">
+                <button class="primary" type="submit">حفظ الضابط</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel">
+            <h2>تقديم طلب ترقية</h2>
+            <form id="promotion-form">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="officer-select">الضابط</label>
+                  <select id="officer-select" name="officer_id" required></select>
+                </div>
+                <div class="field">
+                  <label for="proposed-rank">الرتبة المقترحة</label>
+                  <select id="proposed-rank" name="proposed_rank" required>
+                    <option value="">اختر الرتبة</option>
+                    <option value="ملازم">ملازم</option>
+                    <option value="ملازم أول">ملازم أول</option>
+                    <option value="نقيب">نقيب</option>
+                    <option value="رائد">رائد</option>
+                    <option value="مقدم">مقدم</option>
+                    <option value="عقيد">عقيد</option>
+                    <option value="عميد">عميد</option>
+                    <option value="لواء">لواء</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="requested-by">الجهة الطالبة</label>
+                  <input id="requested-by" name="requested_by" type="text" value="رئيس اللجنة" />
+                </div>
+                <div class="field">
+                  <label for="score">نقاط التقييم</label>
+                  <input id="score" name="score" type="number" min="0" max="100" value="80" />
+                </div>
+                <div class="field full-width">
+                  <label for="reason">سبب الترقية</label>
+                  <textarea id="reason" name="reason" placeholder="أدخل سبب الترقية أو مبررات التقييم..."></textarea>
+                </div>
+              </div>
+              <div class="btn-row">
+                <button class="primary" type="submit">إرسال الطلب</button>
+              </div>
+            </form>
+          </section>
+        </div>
+
+        <section class="panel">
+          <h2>قائمة الضباط</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>الاسم</th>
+                  <th>الرتبة</th>
+                  <th>الوحدة</th>
+                  <th>الاختصاص</th>
+                  <th>سنوات الخدمة</th>
+                  <th>التقييم</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="officer-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>طلبات الترقية</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>الضابط</th>
+                  <th>الرتبة الحالية</th>
+                  <th>الرتبة المقترحة</th>
+                  <th>الجهة</th>
+                  <th>التقييم</th>
+                  <th>الحالة</th>
+                  <th>إجراء</th>
+                </tr>
+              </thead>
+              <tbody id="promotion-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

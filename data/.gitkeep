@@ -1,0 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+
+const dir = path.join(__dirname, 'data');
+fs.mkdirSync(dir, { recursive: true });
+
+const file = path.join(dir, '.gitkeep');
+if (!fs.existsSync(file)) {
+  fs.writeFileSync(file, '');
+}
